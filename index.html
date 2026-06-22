@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EscanerPLP">
+  <title>Escaner Superprecios LP</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-state="idle">
+
+  <header class="app-header">
+    <span class="app-title">Superprecios La Plata</span>
+    <span class="header-badge" id="header-count"></span>
+  </header>
+
+  <!-- PANTALLA: idle -->
+  <section class="screen" data-screen="idle">
+    <div class="idle-body">
+      <div class="idle-logo">
+        <div class="logo-bars">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <h1>Escaner de Etiquetas</h1>
+      <p>Escaneá los productos de la gondola que necesitan nueva etiqueta de precio.</p>
+      <button class="btn btn-primary" id="btn-start">Comenzar nueva sesion</button>
+      <button class="btn btn-outline" id="btn-continue" hidden>Continuar sesion anterior (<span id="continue-count">0</span> productos)</button>
+    </div>
+  </section>
+
+  <!-- PANTALLA: scanning -->
+  <section class="screen" data-screen="scanning">
+    <div class="camera-wrap">
+      <video id="video" playsinline autoplay muted></video>
+      <div class="scan-overlay">
+        <div class="scan-target">
+          <span class="corner tl"></span>
+          <span class="corner tr"></span>
+          <span class="corner bl"></span>
+          <span class="corner br"></span>
+        </div>
+      </div>
+      <div class="last-scan-badge" id="last-scan" hidden></div>
+    </div>
+
+    <div class="list-header">
+      <span id="scan-count-label" class="count-label">0 productos</span>
+      <button class="btn-link" id="btn-to-review">Ver lista completa</button>
+    </div>
+
+    <ul class="scan-list" id="scan-list-scanning" aria-live="polite" aria-label="Productos escaneados"></ul>
+
+    <div class="manual-entry">
+      <input type="text" id="manual-input" inputmode="numeric" pattern="[0-9]*" maxlength="13" placeholder="Ingresar codigo manualmente..." autocomplete="off">
+      <button class="btn-icon" id="btn-manual-add" aria-label="Agregar codigo">+</button>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn btn-outline" id="btn-stop">Finalizar</button>
+      <button class="btn btn-primary" id="btn-export-scanning">Exportar TXT</button>
+    </div>
+  </section>
+
+  <!-- PANTALLA: review -->
+  <section class="screen" data-screen="review">
+    <div class="review-header">
+      <h2 id="review-title">Productos escaneados</h2>
+      <span id="review-count-label" class="count-label"></span>
+    </div>
+
+    <ul class="scan-list" id="scan-list-review" aria-label="Lista de revision"></ul>
+
+    <div class="bottom-bar">
+      <button class="btn btn-outline" id="btn-resume">+ Seguir escaneando</button>
+      <button class="btn btn-secondary" id="btn-export-csv">CSV</button>
+      <button class="btn btn-primary" id="btn-export-txt">Exportar TXT</button>
+    </div>
+    <div class="danger-zone">
+      <button class="btn-danger" id="btn-new-session">Nueva sesion</button>
+    </div>
+  </section>
+
+  <!-- PANTALLA: export confirmation -->
+  <section class="screen" data-screen="export">
+    <div class="export-body">
+      <div class="export-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="9,12 11,14 15,10"/>
+        </svg>
+      </div>
+      <h2>Archivo descargado</h2>
+      <p id="export-filename" class="export-filename"></p>
+      <p class="export-hint">Importa este archivo en Servisoft para seleccionar los productos y imprimir las etiquetas.</p>
+      <button class="btn btn-outline" id="btn-export-back">Volver a la lista</button>
+      <button class="btn btn-secondary" id="btn-export-also-csv" hidden>Exportar tambien en CSV</button>
+    </div>
+  </section>
+
+  <!-- OVERLAY: error de camara -->
+  <div class="overlay" id="camera-error-overlay" hidden>
+    <div class="overlay-card">
+      <h2>Camara no disponible</h2>
+      <p>Para usar el escaner necesitas permitir el acceso a la camara del celular.</p>
+      <div class="camera-steps">
+        <p><strong>Android Chrome:</strong></p>
+        <ol>
+          <li>Tocar el icono del candado en la barra de direcciones</li>
+          <li>Permisos del sitio &rarr; Camara &rarr; Permitir</li>
+          <li>Recargar la pagina</li>
+        </ol>
+      </div>
+      <p>Mientras tanto, podes ingresar los codigos manualmente en el campo de texto.</p>
+      <button class="btn btn-primary" id="btn-dismiss-error">Entendido</button>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

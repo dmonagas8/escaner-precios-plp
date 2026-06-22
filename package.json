@@ -1,0 +1,23 @@
+{
+  "name": "escaner-precios-plp",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "node generate-icons.js && node build.js",
+    "start": "serve . -l $PORT",
+    "dev": "node generate-icons.js && node build.js && npx http-server . -p 8080 -c-1 --cors"
+  },
+  "dependencies": {
+    "serve": "^14.0.0"
+  },
+  "devDependencies": {
+    "@zxing/browser": "^0.2.0",
+    "@zxing/library": "^0.22.0",
+    "esbuild": "^0.24.0",
+    "http-server": "^14.1.1",
+    "idb": "^8.0.3"
+  }
+}
