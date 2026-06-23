@@ -7,11 +7,13 @@
   },
   "scripts": {
     "build": "node generate-icons.js && node build.js",
-    "start": "serve . -l $PORT",
-    "dev": "node generate-icons.js && node build.js && npx http-server . -p 8080 -c-1 --cors"
+    "start": "node server.js",
+    "dev": "node generate-icons.js && node build.js && node server.js"
   },
   "dependencies": {
-    "serve": "^14.0.0"
+    "express": "^4.21.0",
+    "mdb-reader": "^3.2.0",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "@zxing/browser": "^0.2.0",

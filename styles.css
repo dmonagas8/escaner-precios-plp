@@ -393,6 +393,64 @@ body[data-state="export"]   [data-screen="export"]   { display: flex; flex-direc
   animation: none;
 }
 
+/* ── GENERAR BAC ── */
+.bac-section {
+  background: var(--navy2);
+  border-top: 2px solid var(--gray3);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.bac-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bac-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-bac {
+  background: var(--gray2);
+  color: var(--white);
+  border: 1.5px solid var(--gray3);
+  padding: 8px 12px;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-block;
+  width: auto;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.bac-filename {
+  font-size: 12px;
+  color: var(--gray);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.bac-hint {
+  font-size: 12px;
+  color: var(--gray);
+  min-height: 16px;
+}
+
+.bac-hint.ok   { color: var(--green); }
+.bac-hint.err  { color: #ff6b6b; }
+
 .danger-zone {
   display: flex;
   justify-content: center;

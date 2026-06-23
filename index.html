@@ -78,10 +78,23 @@
     <ul class="scan-list" id="scan-list-review" aria-label="Lista de revision"></ul>
 
     <div class="bottom-bar">
-      <button class="btn btn-outline" id="btn-resume">+ Seguir escaneando</button>
+      <button class="btn btn-outline" id="btn-resume">+ Seguir</button>
       <button class="btn btn-secondary" id="btn-export-csv">CSV</button>
-      <button class="btn btn-primary" id="btn-export-txt">Exportar TXT</button>
+      <button class="btn btn-primary" id="btn-export-txt">TXT</button>
     </div>
+
+    <!-- Generar .bac para Servisoft -->
+    <div class="bac-section">
+      <p class="bac-label">Generar archivo para Servisoft</p>
+      <div class="bac-row">
+        <label class="btn btn-bac" for="bac-file-input">Seleccionar BACK.MDB.BAC</label>
+        <input type="file" id="bac-file-input" accept=".bac,.mdb,.BAC,.MDB" hidden>
+        <span class="bac-filename" id="bac-filename">Ningun archivo</span>
+      </div>
+      <button class="btn btn-primary" id="btn-generar-bac" disabled>Generar .bac filtrado</button>
+      <p class="bac-hint" id="bac-status"></p>
+    </div>
+
     <div class="danger-zone">
       <button class="btn-danger" id="btn-new-session">Nueva sesion</button>
     </div>

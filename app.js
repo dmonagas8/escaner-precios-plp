@@ -43,6 +43,13 @@ const btnExportAlsoCsv = $('btn-export-also-csv');
 const cameraErrorOverlay = $('camera-error-overlay');
 const btnDismissError    = $('btn-dismiss-error');
 
+const bacFileInput   = $('bac-file-input');
+const bacFilename    = $('bac-filename');
+const btnGenerarBac  = $('btn-generar-bac');
+const bacStatus      = $('bac-status');
+
+let selectedBacFile = null;
+
 // ── Rendering ──────────────────────────────────────────────────────────────
 function scanItemHTML(scan) {
   const countClass = scan.count > 1 ? 'scan-count highlight' : 'scan-count';
@@ -219,6 +226,63 @@ btnNewSession.addEventListener('click', async () => {
 
 btnDismissError.addEventListener('click', () => {
   cameraErrorOverlay.hidden = true;
+});
+
+// ── Generar .bac ───────────────────────────────────────────────────────────
+bacFileInput.addEventListener('change', () => {
+  const file = bacFileInput.files[0];
+  if (!file) return;
+  selectedBacFile = file;
+  bacFilename.textContent = file.name;
+  btnGenerarBac.disabled = false;
+  bacStatus.textContent = '';
+  bacStatus.className = 'bac-hint';
+});
+
+btnGenerarBac.addEventListener('click', async () => {
+  if (!selectedBacFile) return;
+  const scans = await getAllScans();
+  if (!scans.length) {
+    bacStatus.textContent = 'No hay productos escaneados.';
+    bacStatus.className = 'bac-hint err';
+    return;
+  }
+
+  btnGenerarBac.disabled = true;
+  btnGenerarBac.textContent = 'Generando...';
+  bacStatus.textContent = `Enviando ${scans.length} productos al servidor...`;
+  bacStatus.className = 'bac-hint';
+
+  try {
+    const eans = scans.map(s => s.ean);
+    const formData = new FormData();
+    formData.append('bac', selectedBacFile, selectedBacFile.name);
+    formData.append('eans', JSON.stringify(eans));
+
+    const resp = await fetch('/api/generar-bac', { method: 'POST', body: formData });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: resp.statusText }));
+      throw new Error(err.error || resp.statusText);
+    }
+
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'novedades_filtradas.bac';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    bacStatus.textContent = `Listo. Descargado: novedades_filtradas.bac (${scans.length} productos)`;
+    bacStatus.className = 'bac-hint ok';
+  } catch (err) {
+    bacStatus.textContent = `Error: ${err.message}`;
+    bacStatus.className = 'bac-hint err';
+  } finally {
+    btnGenerarBac.disabled = false;
+    btnGenerarBac.textContent = 'Generar .bac filtrado';
+  }
 });
 
 // ── Init ───────────────────────────────────────────────────────────────────
