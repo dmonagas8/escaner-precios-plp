@@ -1,4 +1,4 @@
-const CACHE = 'escaner-plp-v1';
+const CACHE = 'escaner-plp-v2';
 
 const PRECACHE = [
   '/',
@@ -6,11 +6,13 @@ const PRECACHE = [
   '/app.js',
   '/scanner.js',
   '/db.js',
+  '/catalog.js',
   '/export.js',
   '/styles.css',
   '/manifest.json',
   '/vendor/zxing.min.js',
   '/vendor/idb.min.js',
+  '/vendor/mdb-reader.min.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
 ];

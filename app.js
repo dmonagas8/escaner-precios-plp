@@ -1,6 +1,7 @@
-import { upsertScan, getAllScans, deleteScan, clearAllScans, getCount } from './db.js';
+import { upsertScan, getAllScans, deleteScan, clearAllScans, getCount, putCatalog, lookupProduct, getCatalogCount } from './db.js';
 import { startScanner, stopScanner } from './scanner.js';
 import { exportTXT, exportCSV } from './export.js';
+import { extractFromFile } from './catalog.js';
 
 // ── State ──────────────────────────────────────────────────────────────────
 let state = 'idle';
@@ -48,14 +49,31 @@ const bacFilename    = $('bac-filename');
 const btnGenerarBac  = $('btn-generar-bac');
 const bacStatus      = $('bac-status');
 
+const catalogFileInput = $('catalog-file-input');
+const catalogStatus    = $('catalog-status');
+
 let selectedBacFile = null;
 
 // ── Rendering ──────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatPrecio(n) {
+  return Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function scanItemHTML(scan) {
   const countClass = scan.count > 1 ? 'scan-count highlight' : 'scan-count';
+  const nombreHTML = scan.nombre ? `<span class="scan-nombre">${esc(scan.nombre)}</span>` : '';
+  const precioHTML = scan.precio ? `<span class="scan-precio">$${formatPrecio(scan.precio)}</span>` : '';
   return `
     <li class="scan-item" data-ean="${scan.ean}">
-      <span class="scan-ean">${scan.ean}</span>
+      <div class="scan-info">
+        <span class="scan-ean">${scan.ean}</span>
+        ${nombreHTML}
+      </div>
+      ${precioHTML}
       <span class="${countClass}">&times;${scan.count}</span>
       <button class="scan-delete" data-ean="${scan.ean}" aria-label="Eliminar ${scan.ean}">&times;</button>
     </li>`;
@@ -89,8 +107,8 @@ async function refreshUI() {
 
 // ── Last-scan badge ────────────────────────────────────────────────────────
 let badgeTimeout = null;
-function showLastScan(ean) {
-  lastScanBadge.textContent = ean;
+function showLastScan(ean, nombre) {
+  lastScanBadge.textContent = nombre ? nombre.slice(0, 32) : ean;
   lastScanBadge.hidden = false;
   clearTimeout(badgeTimeout);
   badgeTimeout = setTimeout(() => { lastScanBadge.hidden = true; }, 1800);
@@ -98,8 +116,9 @@ function showLastScan(ean) {
 
 // ── Scanner callbacks ──────────────────────────────────────────────────────
 async function onScan(ean) {
-  await upsertScan(ean);
-  showLastScan(ean);
+  const product = await lookupProduct(ean);
+  await upsertScan(ean, product);
+  showLastScan(ean, product?.nombre);
   await refreshUI();
 }
 
@@ -138,6 +157,12 @@ async function goIdle() {
   }
   setState('idle');
   headerCount.textContent = count > 0 ? count : '';
+
+  const catCount = await getCatalogCount();
+  if (catCount > 0) {
+    catalogStatus.textContent = `Catalogo cargado: ${catCount.toLocaleString('es-AR')} productos`;
+    catalogStatus.className = 'catalog-status ok';
+  }
 }
 
 // ── Delete handler (delegated) ─────────────────────────────────────────────
@@ -158,8 +183,9 @@ async function addManual() {
   const val = manualInput.value.trim().replace(/\D/g, '');
   if (val.length < 8) return;
   manualInput.value = '';
-  await upsertScan(val);
-  showLastScan(val);
+  const product = await lookupProduct(val);
+  await upsertScan(val, product);
+  showLastScan(val, product?.nombre);
   await refreshUI();
 }
 
@@ -226,6 +252,23 @@ btnNewSession.addEventListener('click', async () => {
 
 btnDismissError.addEventListener('click', () => {
   cameraErrorOverlay.hidden = true;
+});
+
+// ── Catalogo ───────────────────────────────────────────────────────────────
+catalogFileInput.addEventListener('change', async () => {
+  const file = catalogFileInput.files[0];
+  if (!file) return;
+  catalogStatus.textContent = 'Cargando catalogo...';
+  catalogStatus.className = 'catalog-status loading';
+  try {
+    const products = await extractFromFile(file);
+    await putCatalog(products);
+    catalogStatus.textContent = `Catalogo cargado: ${products.length.toLocaleString('es-AR')} productos`;
+    catalogStatus.className = 'catalog-status ok';
+  } catch (err) {
+    catalogStatus.textContent = `Error al leer el archivo: ${err.message}`;
+    catalogStatus.className = 'catalog-status err';
+  }
 });
 
 // ── Generar .bac ───────────────────────────────────────────────────────────

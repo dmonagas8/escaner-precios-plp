@@ -32,6 +32,12 @@
       <p>Escaneá los productos de la gondola que necesitan nueva etiqueta de precio.</p>
       <button class="btn btn-primary" id="btn-start">Comenzar nueva sesion</button>
       <button class="btn btn-outline" id="btn-continue" hidden>Continuar sesion anterior (<span id="continue-count">0</span> productos)</button>
+
+      <div class="catalog-section">
+        <label class="btn btn-bac" for="catalog-file-input">Cargar catalogo (BACK.MDB.BAC)</label>
+        <input type="file" id="catalog-file-input" accept=".bac,.mdb,.BAC,.MDB" hidden>
+        <p class="catalog-status" id="catalog-status">Sin catalogo · los productos no mostraran nombre</p>
+      </div>
     </div>
   </section>
 

@@ -300,12 +300,35 @@ body[data-state="export"]   [data-screen="export"]   { display: flex; flex-direc
   to   { opacity: 1; transform: translateY(0); }
 }
 
+.scan-info {
+  flex: 1;
+  min-width: 0;
+}
+
 .scan-ean {
   font-family: 'Courier New', monospace;
   font-size: 14px;
   font-weight: 600;
-  flex: 1;
   letter-spacing: 0.5px;
+  display: block;
+}
+
+.scan-nombre {
+  font-size: 11px;
+  color: var(--gray);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.scan-precio {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .scan-count {
@@ -392,6 +415,26 @@ body[data-state="export"]   [data-screen="export"]   { display: flex; flex-direc
 [data-screen="review"] .scan-item {
   animation: none;
 }
+
+/* ── CATALOG SECTION (idle) ── */
+.catalog-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding-top: 4px;
+  border-top: 1px solid var(--gray2);
+}
+
+.catalog-status {
+  font-size: 12px;
+  color: var(--gray);
+  text-align: center;
+}
+.catalog-status.ok  { color: var(--green); }
+.catalog-status.err { color: #ff6b6b; }
+.catalog-status.loading { color: var(--gray); font-style: italic; }
 
 /* ── GENERAR BAC ── */
 .bac-section {
