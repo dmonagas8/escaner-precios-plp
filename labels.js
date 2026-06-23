@@ -2,29 +2,37 @@ function escHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Try to split name into main + unit/size (e.g. "LECHE ENTERA X 1 LT" → ["LECHE ENTERA", "X 1 LT"])
+function splitNombre(nombre) {
+  const m = nombre.match(/^(.+?)\s+(X\s+[\d,.]+\s*(?:ML|GR|KG|LT|CC|G|L|KGS|GRS)\b.*)$/i);
+  if (m) return [m[1].trim(), m[2].trim().toUpperCase()];
+  return [nombre, null];
+}
+
 function priceFontSize(precio) {
-  const str = '$' + Number(precio).toFixed(2);
-  if (str.length <= 7)  return '24pt'; // $999.99
-  if (str.length <= 9)  return '20pt'; // $99999.99
-  if (str.length <= 11) return '17pt'; // $9999999.99
-  return '14pt';
+  const len = Number(precio).toFixed(2).length;
+  if (len <= 6)  return '36pt';
+  if (len <= 8)  return '30pt';
+  if (len <= 10) return '26pt';
+  return '22pt';
 }
 
 function makeLabelHTML(scan, dateStr) {
-  const price = '$' + Number(scan.precio).toFixed(2);
-  const nombre = escHtml((scan.nombre || scan.ean).toUpperCase());
+  const priceStr = escHtml(Number(scan.precio).toFixed(2));
   const fontSize = priceFontSize(scan.precio);
+  const rawName = (scan.nombre || '').toUpperCase() || scan.ean;
+  const [mainName, subName] = splitNombre(rawName);
 
   return `<div class="label">
-  <div class="ll">
-    <span class="ean">${scan.ean}</span>
+  <div class="lh">
+    <span class="lname">${escHtml(mainName)}</span>${subName ? `\n    <span class="lsub">${escHtml(subName)}</span>` : ''}
+  </div>
+  <div class="lp">
+    <span class="price" style="font-size:${fontSize}">${priceStr}</span>
+  </div>
+  <div class="lf">
+    <span class="lean">${scan.ean}</span>
     <span class="ldate">${dateStr}</span>
-  </div>
-  <div class="lc">
-    <div class="price" style="font-size:${fontSize}">${price}</div>
-  </div>
-  <div class="lr">
-    <span class="nombre">${nombre}</span>
   </div>
 </div>`;
 }
@@ -33,7 +41,7 @@ export function printLabels(scans) {
   const items = scans.filter(s => s.precio != null);
 
   if (!items.length) {
-    alert('Sin precios para imprimir. Cargá el catálogo primero desde la pantalla de inicio.');
+    alert('Sin precios para imprimir.\nCargá el catálogo (BACK.MDB.BAC) desde la pantalla de inicio primero.');
     return;
   }
 
@@ -46,7 +54,7 @@ export function printLabels(scans) {
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Etiquetas Superprecios La Plata</title>
+<title>Etiquetas</title>
 <style>
 @page { size: A4 portrait; margin: 8mm; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,86 +63,77 @@ body { font-family: Arial, Helvetica, sans-serif; background: #fff; color: #000;
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 60mm);
-  gap: 3mm;
+  gap: 2.5mm;
 }
 
+/* ── Label container ── */
 .label {
   width: 60mm;
   height: 30mm;
   border: 0.5pt solid #000;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  padding: 1.5mm 2mm 1mm;
   overflow: hidden;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
-/* Left strip: EAN + date */
-.ll {
-  width: 8mm;
-  flex-shrink: 0;
+/* ── Header: product name ── */
+.lh {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 1mm 0.5mm;
-  border-right: 0.3pt solid #bbb;
+  flex-shrink: 0;
+  line-height: 1.2;
 }
-.ean {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 4pt;
-  line-height: 1;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  letter-spacing: 0.3pt;
+.lname {
+  font-size: 6.5pt;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.1pt;
 }
-.ldate {
-  font-size: 3.5pt;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
+.lsub {
+  font-size: 6pt;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
 }
 
-/* Center: price */
-.lc {
+/* ── Price ── */
+.lp {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1mm;
   overflow: hidden;
 }
 .price {
+  font-family: 'Arial Black', Arial, sans-serif;
   font-weight: 900;
   line-height: 1;
   white-space: nowrap;
   text-align: center;
+  letter-spacing: -0.5pt;
 }
 
-/* Right strip: product name */
-.lr {
-  width: 14mm;
-  flex-shrink: 0;
+/* ── Footer: EAN + date ── */
+.lf {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1mm 0.5mm;
-  border-left: 0.3pt solid #bbb;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-shrink: 0;
+  margin-top: 0.5mm;
 }
-.nombre {
-  font-size: 5pt;
-  font-weight: 700;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  text-align: center;
-  text-transform: uppercase;
-  line-height: 1.15;
-  max-height: 27mm;
-  overflow: hidden;
-  word-break: break-word;
+.lean, .ldate {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 3.8pt;
+  line-height: 1;
 }
 
 @media print {
-  .grid { gap: 2mm; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
 </head>
