@@ -273,6 +273,9 @@ catalogFileInput.addEventListener('change', async () => {
     await putCatalog(products);
     catalogStatus.textContent = `Catalogo cargado: ${products.length.toLocaleString('es-AR')} productos`;
     catalogStatus.className = 'catalog-status ok';
+    // Reuse the same file for .bac generation — no need to select twice
+    selectedBacFile = file;
+    bacFilename.textContent = file.name;
   } catch (err) {
     console.error('Catalog load error:', err);
     catalogStatus.textContent = `Error: ${err.message}`;
