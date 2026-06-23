@@ -1,6 +1,7 @@
 import { upsertScan, getAllScans, deleteScan, clearAllScans, getCount, putCatalog, lookupProduct, getCatalogCount } from './db.js';
 import { startScanner, stopScanner } from './scanner.js';
 import { exportTXT, exportCSV } from './export.js';
+import { printLabels } from './labels.js';
 
 // ── State ──────────────────────────────────────────────────────────────────
 let state = 'idle';
@@ -42,6 +43,8 @@ const btnExportAlsoCsv = $('btn-export-also-csv');
 
 const cameraErrorOverlay = $('camera-error-overlay');
 const btnDismissError    = $('btn-dismiss-error');
+
+const btnPrintLabels = $('btn-print-labels');
 
 const bacFileInput   = $('bac-file-input');
 const bacFilename    = $('bac-filename');
@@ -283,6 +286,16 @@ catalogFileInput.addEventListener('change', async () => {
   } finally {
     btnCatalogLoad.disabled = false;
   }
+});
+
+// ── Imprimir etiquetas ─────────────────────────────────────────────────────
+btnPrintLabels.addEventListener('click', async () => {
+  const scans = await getAllScans();
+  if (!scans.length) {
+    alert('No hay productos escaneados.');
+    return;
+  }
+  printLabels(scans);
 });
 
 // ── Generar .bac ───────────────────────────────────────────────────────────

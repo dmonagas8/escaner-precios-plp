@@ -1,4 +1,4 @@
-const CACHE = 'escaner-plp-v3';
+const CACHE = 'escaner-plp-v4';
 
 const PRECACHE = [
   '/',
@@ -7,6 +7,7 @@ const PRECACHE = [
   '/scanner.js',
   '/db.js',
   '/export.js',
+  '/labels.js',
   '/styles.css',
   '/manifest.json',
   '/vendor/zxing.min.js',

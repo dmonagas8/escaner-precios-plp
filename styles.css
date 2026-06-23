@@ -417,6 +417,18 @@ body[data-state="export"]   [data-screen="export"]   { display: flex; flex-direc
   animation: none;
 }
 
+/* ── PRINT SECTION (review) ── */
+.print-section {
+  padding: 10px 12px 0;
+  flex-shrink: 0;
+}
+
+.btn-print {
+  background: #2a9d8f;
+  color: var(--white);
+}
+.btn-print:hover { background: #21867a; }
+
 /* ── CATALOG SECTION (idle) ── */
 .catalog-section {
   display: flex;
