@@ -1,7 +1,6 @@
 import { upsertScan, getAllScans, deleteScan, clearAllScans, getCount, putCatalog, lookupProduct, getCatalogCount } from './db.js';
 import { startScanner, stopScanner } from './scanner.js';
 import { exportTXT, exportCSV } from './export.js';
-import { extractFromFile } from './catalog.js';
 
 // ── State ──────────────────────────────────────────────────────────────────
 let state = 'idle';
@@ -268,6 +267,7 @@ catalogFileInput.addEventListener('change', async () => {
   catalogStatus.className = 'catalog-status loading';
   btnCatalogLoad.disabled = true;
   try {
+    const { extractFromFile } = await import('./catalog.js');
     const products = await extractFromFile(file);
     await putCatalog(products);
     catalogStatus.textContent = `Catalogo cargado: ${products.length.toLocaleString('es-AR')} productos`;
