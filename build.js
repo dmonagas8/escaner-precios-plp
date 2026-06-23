@@ -36,16 +36,13 @@ esbuild.buildSync({
 });
 console.log('Built: vendor/idb.min.js');
 
-// Bundle mdb-reader (reads Access MDB files in the browser)
+// Bundle catalog.js + mdb-reader + all Node polyfills into one browser module
 esbuild.buildSync({
-  stdin: {
-    contents: `export { default as MDBReader } from 'mdb-reader';`,
-    resolveDir: __dirname,
-  },
+  entryPoints: ['catalog.js'],
   bundle: true,
   minify: true,
   format: 'esm',
-  outfile: 'vendor/mdb-reader.min.js',
+  outfile: 'vendor/catalog.min.js',
   platform: 'browser',
   alias: {
     buffer: 'buffer',
@@ -54,4 +51,4 @@ esbuild.buildSync({
   },
   inject: [path.join(__dirname, 'process-inject.js')],
 });
-console.log('Built: vendor/mdb-reader.min.js');
+console.log('Built: vendor/catalog.min.js');

@@ -1,4 +1,4 @@
-import { MDBReader } from './vendor/mdb-reader.min.js';
+import MDBReader from 'mdb-reader';
 
 function normalizeEAN(raw) {
   const n = String(raw ?? '').trim();
@@ -15,7 +15,8 @@ function formatPrice(val) {
 
 export async function extractFromFile(file) {
   const buffer = await file.arrayBuffer();
-  const db = new MDBReader(new Uint8Array(buffer));
+  // Buffer is injected by esbuild (process-inject.js) — has .copy() needed by mdb-reader
+  const db = new MDBReader(Buffer.from(buffer));
 
   const byEAN = new Map();
 

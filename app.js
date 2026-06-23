@@ -267,7 +267,7 @@ catalogFileInput.addEventListener('change', async () => {
   catalogStatus.className = 'catalog-status loading';
   btnCatalogLoad.disabled = true;
   try {
-    const { extractFromFile } = await import('./catalog.js');
+    const { extractFromFile } = await import('./vendor/catalog.min.js');
     const products = await extractFromFile(file);
     await putCatalog(products);
     catalogStatus.textContent = `Catalogo cargado: ${products.length.toLocaleString('es-AR')} productos`;
