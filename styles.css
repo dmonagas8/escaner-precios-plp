@@ -138,6 +138,7 @@ body[data-state="export"]   [data-screen="export"]   { display: flex; flex-direc
   -webkit-tap-highlight-color: transparent;
 }
 .btn:active { opacity: 0.8; transform: scale(0.98); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
 .btn-primary  { background: var(--red);   color: var(--white); }
 .btn-primary:hover  { background: var(--red2); }

@@ -45,6 +45,7 @@ const btnDismissError    = $('btn-dismiss-error');
 
 const bacFileInput   = $('bac-file-input');
 const bacFilename    = $('bac-filename');
+const btnBacSelect   = $('btn-bac-select');
 const btnGenerarBac  = $('btn-generar-bac');
 const bacStatus      = $('bac-status');
 
@@ -282,18 +283,26 @@ catalogFileInput.addEventListener('change', async () => {
 });
 
 // ── Generar .bac ───────────────────────────────────────────────────────────
+btnBacSelect.addEventListener('click', () => {
+  bacFileInput.value = '';
+  bacFileInput.click();
+});
+
 bacFileInput.addEventListener('change', () => {
   const file = bacFileInput.files[0];
   if (!file) return;
   selectedBacFile = file;
   bacFilename.textContent = file.name;
-  btnGenerarBac.disabled = false;
   bacStatus.textContent = '';
   bacStatus.className = 'bac-hint';
 });
 
 btnGenerarBac.addEventListener('click', async () => {
-  if (!selectedBacFile) return;
+  if (!selectedBacFile) {
+    bacStatus.textContent = 'Primero selecciona el archivo BACK.MDB.BAC.';
+    bacStatus.className = 'bac-hint err';
+    return;
+  }
   const scans = await getAllScans();
   if (!scans.length) {
     bacStatus.textContent = 'No hay productos escaneados.';
