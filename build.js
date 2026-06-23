@@ -50,6 +50,7 @@ esbuild.buildSync({
     buffer: 'buffer',
     events: 'events',
     stream: 'readable-stream',
+    process: 'process/browser',
   },
 });
 console.log('Built: vendor/mdb-reader.min.js');
