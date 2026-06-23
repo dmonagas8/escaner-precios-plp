@@ -49,8 +49,9 @@ const bacFilename    = $('bac-filename');
 const btnGenerarBac  = $('btn-generar-bac');
 const bacStatus      = $('bac-status');
 
-const catalogFileInput = $('catalog-file-input');
-const catalogStatus    = $('catalog-status');
+const catalogFileInput  = $('catalog-file-input');
+const catalogStatus     = $('catalog-status');
+const btnCatalogLoad    = $('btn-catalog-load');
 
 let selectedBacFile = null;
 
@@ -255,19 +256,28 @@ btnDismissError.addEventListener('click', () => {
 });
 
 // ── Catalogo ───────────────────────────────────────────────────────────────
+btnCatalogLoad.addEventListener('click', () => {
+  catalogFileInput.value = '';
+  catalogFileInput.click();
+});
+
 catalogFileInput.addEventListener('change', async () => {
   const file = catalogFileInput.files[0];
   if (!file) return;
   catalogStatus.textContent = 'Cargando catalogo...';
   catalogStatus.className = 'catalog-status loading';
+  btnCatalogLoad.disabled = true;
   try {
     const products = await extractFromFile(file);
     await putCatalog(products);
     catalogStatus.textContent = `Catalogo cargado: ${products.length.toLocaleString('es-AR')} productos`;
     catalogStatus.className = 'catalog-status ok';
   } catch (err) {
-    catalogStatus.textContent = `Error al leer el archivo: ${err.message}`;
+    console.error('Catalog load error:', err);
+    catalogStatus.textContent = `Error: ${err.message}`;
     catalogStatus.className = 'catalog-status err';
+  } finally {
+    btnCatalogLoad.disabled = false;
   }
 });
 
