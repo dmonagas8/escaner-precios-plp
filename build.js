@@ -1,5 +1,6 @@
 const esbuild = require('esbuild');
 const fs = require('fs');
+const path = require('path');
 
 fs.mkdirSync('vendor', { recursive: true });
 
@@ -50,7 +51,7 @@ esbuild.buildSync({
     buffer: 'buffer',
     events: 'events',
     stream: 'readable-stream',
-    process: 'process/browser',
   },
+  inject: [path.join(__dirname, 'process-inject.js')],
 });
 console.log('Built: vendor/mdb-reader.min.js');
