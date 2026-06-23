@@ -40,9 +40,10 @@ app.post('/api/generar-bac', upload.single('bac'), (req, res) => {
     const tableNames = db.getTableNames();
 
     // Create new empty JET3 database
-    const created = spawnSync('mdb-create', ['-v', 'JET3', outPath]);
-    if (created.status !== 0) {
-      throw new Error('mdb-create failed: ' + (created.stderr || '').toString());
+    const created = spawnSync('mdb-create', ['-v', 'JET3', outPath], { encoding: 'utf8' });
+    console.log('mdb-create status:', created.status, 'stderr:', created.stderr, 'stdout:', created.stdout, 'error:', created.error);
+    if (created.error || created.status !== 0) {
+      throw new Error(`mdb-create failed (status ${created.status}): ${created.stderr || ''} ${created.error?.message || ''}`);
     }
 
     for (const tableName of tableNames) {
